@@ -2,6 +2,7 @@ import { useState, useRef } from "react"
 
 export default function TodoList(){
     const [todoTasks, setTodoTasks] = useState([]);
+    const [doneTasks, setDoneTasks] = useState([]);
     const [task, setTask] = useState("");
     const emptyTask = useRef(null);
     const handleTaskChange = (e) =>{
@@ -13,12 +14,30 @@ export default function TodoList(){
             // emptyTask.classList.remove('d-none');
             // emptyTask.classList.add('d-block');
         }
-        else{
+        else{   
             setTodoTasks([...todoTasks,task]);
             setTask("");
         }
         
 
+    }
+    const markDone = (index, action) => {
+        if (action === 'check'){
+            setDoneTasks([...doneTasks, todoTasks[index]]);
+            const newTodo = [...todoTasks];
+            newTodo.splice(index, 1);
+            setTodoTasks(newTodo);
+        }
+        else if(action === 'delete todo'){        
+            const newTodo = [...todoTasks];
+            newTodo.splice(index, 1);
+            setTodoTasks(newTodo);
+        }
+        else if(action === 'delete done'){
+            const newDone = [...doneTasks];
+            newDone.splice(index);
+            setDoneTasks(newDone);
+        }
     }
     return(
         <>
@@ -36,29 +55,38 @@ export default function TodoList(){
         </div>
         <div id="emptyTask" className="d-none text-danger lead-1">task is empty</div>
         <div id="todoTasks" className="container-fluid m-5 shadow bg-light">
-            <h2 className="display-3">Tasks</h2>
-            <div className="d-flex align-items-center">
-                {
-                todoTasks.map((task,index) =>
-                    (   <div key={index} className="border-bottom rounded-2">
-                        <button className="btn btn-outline-success d-flex-inline align-items-center justify-content-center"><i className="bi bi-check2 fs-6"></i></button>    
-                        <h2 className="my-3 rounded-0 display-6">{task}</h2>
-                            
+            <h2 className="display-3">ToDo</h2>
+            {
+            todoTasks.length > 0 &&
+            todoTasks.map((task,index) =>
+                (   
+                    <div className="d-block" key={index}>
+                        <div className="border-bottom rounded-2 d-flex align-items-center tasks">
+                            <button className="btn btn-outline-success" onClick={() => markDone(index, 'check')}><i className="bi bi-check2 fs-6"></i></button>   
+                            <span className="my-3 rounded-0 display-6 ms-3 w-75" style={{wordWrap: 'break-word'}}>{task}</span>
+                            <button className="btn btn-outline-danger d-flex-end" onClick={() => markDone(index, 'delete todo')}><i className="bi bi-trash fs-6"></i></button>    
                         </div>
-                    )
+                    </div>
                 )
-                }
-            </div>
-                
+            ) 
+            }               
         </div>
         <div ref={emptyTask} className="container-fluid m-5 shadow bg-light">
-            <h2 className="display-3">Tasks</h2>
-            <ul>
-                <li>task1</li>
-                <li>task1</li>
-                <li>task1</li>
-                <li>task1</li>
-            </ul>
+            <h2 className="display-3">Done</h2>
+            {
+            doneTasks.length > 0 &&
+            doneTasks.map((task,index) =>
+                (   
+                    <div className="d-block" key={index}>
+                        <div className="border-bottom rounded-2 d-flex align-items-center tasks">
+                            <button className="btn btn-success disabled"><i className="bi bi-check2 fs-6"></i></button>    
+                            <span className="my-3 rounded-0 display-6 ms-3 w-75" style={{wordWrap: 'break-word'}}>{task}</span>
+                            <button className="btn btn-outline-danger d-flex-end" onClick={() => markDone(index, 'delete done')}><i className="bi bi-trash fs-6"></i></button>
+                        </div>
+                    </div>
+                )
+            ) 
+            } 
         </div>
         </>
     )
